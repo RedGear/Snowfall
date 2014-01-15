@@ -3,13 +3,13 @@
 <properties version="1.0">
 	<comment>Italian (it_IT) Localization File for Snowfall.</comment>
 	
-	<entry key="item.redgear.snowfall.itemToolSnowshovelWood.name">Legno Pala da Neve</entry>
-	<entry key="item.redgear.snowfall.itemToolSnowshovelStone.name">Neve Pietra Pala</entry>
-	<entry key="item.redgear.snowfall.itemToolSnowshovelBronze.name">Neve Bronzo Pala</entry>
-	<entry key="item.redgear.snowfall.itemToolSnowshovelIron.name">Neve Pala di Ferro</entry>
-	<entry key="item.redgear.snowfall.itemToolSnowshovelSteel.name">In Acciaio Pala da Neve</entry>
-	<entry key="item.redgear.snowfall.itemToolSnowshovelGold.name">Neve Oro Pala</entry>
-	<entry key="item.redgear.snowfall.itemToolSnowshovelDiamond.name">Diamante Pala da Neve</entry>
+	<entry key="item.snowShovelWood.name">Legno Pala da Neve</entry>
+	<entry key="item.snowShovelStone.name">Neve Pietra Pala</entry>
+	<entry key="item.snowShovelBronze.name">Neve Bronzo Pala</entry>
+	<entry key="item.snowShovelIron.name">Neve Pala di Ferro</entry>
+	<entry key="item.snowShovelSteel.name">In Acciaio Pala da Neve</entry>
+	<entry key="item.snowShovelGold.name">Neve Oro Pala</entry>
+	<entry key="item.snowShovelDiamond.name">Diamante Pala da Neve</entry>
 	
     
 </properties>

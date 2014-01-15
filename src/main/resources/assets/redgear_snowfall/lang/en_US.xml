@@ -3,13 +3,13 @@
 <properties version="1.0">
 	<comment>English (en_US) Localization File for Snowfall.</comment>
 	
-	<entry key="item.redgear.snowfall.itemToolSnowshovelWood.name">Wooden Snow Shovel</entry>
-	<entry key="item.redgear.snowfall.itemToolSnowshovelStone.name">Stone Snow Shovel</entry>
-	<entry key="item.redgear.snowfall.itemToolSnowshovelBronze.name">Bronze Snow Shovel</entry>
-	<entry key="item.redgear.snowfall.itemToolSnowshovelIron.name">Iron Snow Shovel</entry>
-	<entry key="item.redgear.snowfall.itemToolSnowshovelSteel.name">Steel Snow Shovel</entry>
-	<entry key="item.redgear.snowfall.itemToolSnowshovelGold.name">Golden Snow Shovel</entry>
-	<entry key="item.redgear.snowfall.itemToolSnowshovelDiamond.name">Diamond Snow Shovel</entry>
+	<entry key="item.snowShovelWood.name">Wooden Snow Shovel</entry>
+	<entry key="item.snowShovelStone.name">Stone Snow Shovel</entry>
+	<entry key="item.snowShovelBronze.name">Bronze Snow Shovel</entry>
+	<entry key="item.snowShovelIron.name">Iron Snow Shovel</entry>
+	<entry key="item.snowShovelSteel.name">Steel Snow Shovel</entry>
+	<entry key="item.snowShovelGold.name">Golden Snow Shovel</entry>
+	<entry key="item.snowShovelDiamond.name">Diamond Snow Shovel</entry>
 	
     
 </properties>

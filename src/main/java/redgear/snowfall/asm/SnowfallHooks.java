@@ -3,59 +3,58 @@ package redgear.snowfall.asm;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockBush;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
+import redgear.core.util.SimpleItem;
+import redgear.core.world.WorldLocation;
 
 public class SnowfallHooks {
-	public static void updateTick(World par1World, int par2, int par3, int par4, Random par5Random) {
-		int j1 = par1World.getBlockMetadata(par2, par3, par4);
-		int k1 = j1 & 7;
+	public static void updateTick(World world, int x, int y, int z, Random rand) {
+		WorldLocation loc = new WorldLocation(x, y, z, world);
 
-		if (par1World.getSavedLightValue(EnumSkyBlock.Block, par2, par3, par4) > 11)
-			if (j1 < 1)
-				par1World.setBlock(par2, par3, par4, 0, 0, 2);
+		int meta = loc.getBlockMeta();
+		int k1 = meta & 7;
+
+		if (world.getSavedLightValue(EnumSkyBlock.Block, x, y, z) > 11)
+			if (meta < 1)
+				loc.setAir();
 			else
-				par1World.setBlockMetadataWithNotify(par2, par3, par4, k1 - 1, 2);
-		else if (j1 < 7 && par1World.isRaining() && par5Random.nextInt(8) + 1 > 7
-				&& par1World.canBlockSeeTheSky(par2, par3, par4))
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, k1 + 1 | j1 & -8, 2);
+				loc.placeBlock(new SimpleItem(Blocks.snow_layer, k1 - 1));
+		else if (meta < 7 && world.isRaining() && rand.nextInt(8) + 1 > 7 && world.canBlockSeeTheSky(x, y, z))
+			loc.placeBlock(new SimpleItem(Blocks.snow_layer, k1 + 1 | meta & -8));
 	}
 
 	public static boolean canPlaceBlockAt(World world, int x, int y, int z) {
-		int l = world.getBlockId(x, y - 1, z);
-		Block block = Block.blocksList[l];
+		WorldLocation loc = new WorldLocation(x, y, z, world).translate(ForgeDirection.DOWN, 1);
 
-		if (block == null)
-			return false;
-
-		return block.isLeaves(world, x, y, z) || world.isBlockSolidOnSide(x, y - 1, z, ForgeDirection.UP);
+		//Block below must be soid, with leaves being an exception. 
+		return loc.isSideSolid(ForgeDirection.UP) || loc.getBlock().isLeaves(world, x, y, z);
 	}
 
 	public static boolean canSnowAtBody(World world, int x, int y, int z) {
 		BiomeGenBase biomegenbase = world.getBiomeGenForCoords(x, z);
-		float f = biomegenbase.getFloatTemperature();
+		float f = biomegenbase.getFloatTemperature(x, y, z);
 
 		if (f > 0.15F)
 			return false;
 		else {
 			if (y >= 0 && y < 256 && world.getSavedLightValue(EnumSkyBlock.Block, x, y, z) < 10) {
-				int i1 = world.getBlockId(x, y, z);
+				Block block = world.getBlock(x, y, z);
 
-				if (i1 == 0 && Block.snow.canPlaceBlockAt(world, x, y, z))
+				if ((block.isAir(world, x, y, z) || block instanceof BlockBush)
+						&& Blocks.snow_layer.canPlaceBlockAt(world, x, y, z))
 					return true;
 			}
 
 			return false;
 		}
-	}
-
-	public static boolean isBlockSolidOnSide(World world, int x, int y, int z, ForgeDirection direct) {
-		return direct != ForgeDirection.UP || world.getBlockMetadata(x, y, z) > 6;
 	}
 
 	/**
@@ -64,27 +63,28 @@ public class SnowfallHooks {
 	 * True if something happen and false if it don't. This is for ITEMS, not
 	 * BLOCKS
 	 */
-	public static int onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int par4,
-			int par5, int par6, int par7, float par8, float par9, float par10) {
-		if (par1ItemStack.stackSize == 0)
+	public static int onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side,
+			float par8, float par9, float par10) {
+		WorldLocation loc = new WorldLocation(x, y, z, world);
+
+		if (stack.stackSize == 0)
 			return 1;
 
-		if (!par2EntityPlayer.canPlayerEdit(par4, par5, par6, par7, par1ItemStack))
+		if (!player.canPlayerEdit(x, y, z, side, stack))
 			return 1;
 
-		int i1 = par3World.getBlockId(par4, par5, par6);
+		Block target = loc.getBlock();
+		Block snow = Blocks.snow_layer;
 
-		if (i1 == Block.snow.blockID) {
-			Block block = Block.snow;
-			int meta = par3World.getBlockMetadata(par4, par5, par6);
+		if (target == snow) {
+			int meta = loc.getBlockMeta();
 
 			if (meta <= 6) {
-				if (par3World
-						.checkNoEntityCollision(block.getCollisionBoundingBoxFromPool(par3World, par4, par5, par6))
-						&& par3World.setBlockMetadataWithNotify(par4, par5, par6, meta + 1, 2)) {
-					par3World.playSoundEffect(par4 + 0.5F, par5 + 0.5F, par6 + 0.5F, block.stepSound.getPlaceSound(),
-							(block.stepSound.getVolume() + 1.0F) / 2.0F, block.stepSound.getPitch() * 0.8F);
-					--par1ItemStack.stackSize;
+				if (world.checkNoEntityCollision(snow.getCollisionBoundingBoxFromPool(world, x, y, z))
+						&& world.setBlockMetadataWithNotify(x, y, z, meta + 1, 2)) {
+					world.playSoundEffect(x + 0.5F, y + 0.5F, z + 0.5F, snow.stepSound.soundName,
+							(snow.stepSound.getVolume() + 1.0F) / 2.0F, snow.stepSound.getPitch() * 0.8F);
+					--stack.stackSize;
 
 					return 0;
 				}
@@ -118,9 +118,10 @@ public class SnowfallHooks {
 			EntityItem entityitem = null;
 
 			if (isLayered)
-				entityitem = new EntityItem(world, x + d0, y + d1, z + d2, new ItemStack(Block.snow, meta + 1, 0));
+				entityitem = new EntityItem(world, x + d0, y + d1, z + d2,
+						new ItemStack(Blocks.snow_layer, meta + 1, 0));
 			else
-				entityitem = new EntityItem(world, x + d0, y + d1, z + d2, new ItemStack(Block.blockSnow, 1, 0));
+				entityitem = new EntityItem(world, x + d0, y + d1, z + d2, new ItemStack(Blocks.snow, 1, 0));
 
 			if (entityitem != null) {
 				entityitem.delayBeforeCanPickup = 10;

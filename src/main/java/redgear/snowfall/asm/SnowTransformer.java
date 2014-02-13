@@ -205,29 +205,16 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 			canPlaceBlockAt.add(new MethodInsnNode(INVOKESTATIC, snowfallHooks, "canPlaceBlockAt", "(" + worldName
 					+ "III)Z"));
 			canPlaceBlockAt.add(new InsnNode(IRETURN));
-			InsnList isBlockSolidOnSide = new InsnList();
-			isBlockSolidOnSide.add(new VarInsnNode(ALOAD, 1));
-			isBlockSolidOnSide.add(new VarInsnNode(ILOAD, 2));
-			isBlockSolidOnSide.add(new VarInsnNode(ILOAD, 3));
-			isBlockSolidOnSide.add(new VarInsnNode(ILOAD, 4));
-			isBlockSolidOnSide.add(new VarInsnNode(ALOAD, 5));
-			isBlockSolidOnSide.add(new MethodInsnNode(INVOKESTATIC, snowfallHooks, "isBlockSolidOnSide", "("
-					+ worldName + "IIILnet/minecraftforge/common/ForgeDirection;)Z"));
-			isBlockSolidOnSide.add(new InsnNode(IRETURN));
-			MethodNode isBlockSolid = new MethodNode(ACC_PUBLIC, "isBlockSolidOnSide", "(" + worldName
-					+ "IIILnet/minecraftforge/common/ForgeDirection;)Z", null, new String[] {});
-			isBlockSolid.instructions = isBlockSolidOnSide;
-			node.methods.add(isBlockSolid);
 
 			for (MethodNode method : node.methods) {
 				String mappedName = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(name, method.name, method.desc);
-				if ("func_71847_b".equals(mappedName) && RedGearCore.util.getBoolean("SnowGrowthAndDecay"))
-					method.instructions = updateTick;
+				if ("func_149674_a".equals(mappedName) && RedGearCore.util.getBoolean("SnowGrowthAndDecay"))//func_71847_b
+					method.instructions = updateTick;//func_149674_a
 
-				if ("func_71893_a".equals(mappedName) && RedGearCore.util.getBoolean("SnowfallShovelHook"))
+				if ("func_149636_a".equals(mappedName) && RedGearCore.util.getBoolean("SnowfallShovelHook"))//func_71893_a
 					method.instructions.insertBefore(method.instructions.getFirst(), harvestBlock);
 
-				if ("func_71930_b".equals(mappedName) && RedGearCore.util.getBoolean("SnowPlaceOnSolidSide"))
+				if ("func_149742_c".equals(mappedName) && RedGearCore.util.getBoolean("SnowPlaceOnSolidSide"))//func_71930_b
 					method.instructions = canPlaceBlockAt;
 			}
 
@@ -257,5 +244,10 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 	@Override
 	public void injectData(Map<String, Object> arg0) {
 
+	}
+
+	@Override
+	public String getAccessTransformerClass() {
+		return null;
 	}
 }

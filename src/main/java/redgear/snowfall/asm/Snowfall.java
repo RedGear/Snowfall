@@ -1,10 +1,11 @@
 package redgear.snowfall.asm;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.EnumToolMaterial;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.EnumHelper;
+import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import redgear.core.mod.ModUtils;
 import redgear.snowfall.item.ItemSnowShovel;
@@ -30,33 +31,22 @@ public class Snowfall extends ModUtils {
 	public static Item itemToolSnowshovelDiamond;
 	public static Item itemToolSnowshovelGold;
 
-	public Snowfall() {
-		super(0, 23300);
-	}
-
 	@Override
 	public void PreInit(FMLPreInitializationEvent event) {
 
 		if (getBoolean("snowShovels")) {
-			EnumToolMaterial toolMaterialBronze = EnumHelper.addToolMaterial("Bronze", 2, 131, 5.0F, 2, 18);
-			EnumToolMaterial toolMaterialSteel = EnumHelper.addToolMaterial("Steel", 2, 500, 7.0F, 4, 10);
-			itemToolSnowshovelWood = new ItemSnowShovel(getItemId("snowShovelWood"), EnumToolMaterial.WOOD)
-					.setUnlocalizedName("snowShovelWood");
-			
-			itemToolSnowshovelStone = new ItemSnowShovel(getItemId("snowShovelStone"), EnumToolMaterial.STONE)
-					.setUnlocalizedName("snowShovelStone");
-			itemToolSnowshovelBronze = new ItemSnowShovel(getItemId("snowShovelBronze"), toolMaterialBronze)
-					.setUnlocalizedName("snowShovelBronze");
-			itemToolSnowshovelIron = new ItemSnowShovel(getItemId("snowShovelIron"), EnumToolMaterial.IRON)
-					.setUnlocalizedName("snowShovelIron");
-			itemToolSnowshovelSteel = new ItemSnowShovel(getItemId("snowShovelSteel"), toolMaterialSteel)
-					.setUnlocalizedName("snowShovelSteel");
-			itemToolSnowshovelDiamond = new ItemSnowShovel(getItemId("snowShovelDiamond"), EnumToolMaterial.EMERALD)
+			ToolMaterial toolMaterialBronze = EnumHelper.addToolMaterial("Bronze", 2, 131, 5.0F, 2, 18);
+			ToolMaterial toolMaterialSteel = EnumHelper.addToolMaterial("Steel", 2, 500, 7.0F, 4, 10);
+			itemToolSnowshovelWood = new ItemSnowShovel(ToolMaterial.WOOD).setUnlocalizedName("snowShovelWood");
+
+			itemToolSnowshovelStone = new ItemSnowShovel(ToolMaterial.STONE).setUnlocalizedName("snowShovelStone");
+			itemToolSnowshovelBronze = new ItemSnowShovel(toolMaterialBronze).setUnlocalizedName("snowShovelBronze");
+			itemToolSnowshovelIron = new ItemSnowShovel(ToolMaterial.IRON).setUnlocalizedName("snowShovelIron");
+			itemToolSnowshovelSteel = new ItemSnowShovel(toolMaterialSteel).setUnlocalizedName("snowShovelSteel");
+			itemToolSnowshovelDiamond = new ItemSnowShovel(ToolMaterial.EMERALD)
 					.setUnlocalizedName("snowShovelDiamond");
-			itemToolSnowshovelGold = new ItemSnowShovel(getItemId("snowShovelGold"), EnumToolMaterial.GOLD)
-					.setUnlocalizedName("snowShovelGold");
-			
-			
+			itemToolSnowshovelGold = new ItemSnowShovel(ToolMaterial.GOLD).setUnlocalizedName("snowShovelGold");
+
 			GameRegistry.registerItem(itemToolSnowshovelStone, "snowShovelWood", "RedGear|Snowfall");
 			GameRegistry.registerItem(itemToolSnowshovelWood, "snowShovelStone", "RedGear|Snowfall");
 			GameRegistry.registerItem(itemToolSnowshovelBronze, "snowShovelBronze", "RedGear|Snowfall");
@@ -64,48 +54,46 @@ public class Snowfall extends ModUtils {
 			GameRegistry.registerItem(itemToolSnowshovelSteel, "snowShovelSteel", "RedGear|Snowfall");
 			GameRegistry.registerItem(itemToolSnowshovelDiamond, "snowShovelDiamond", "RedGear|Snowfall");
 			GameRegistry.registerItem(itemToolSnowshovelGold, "snowShovelGold", "RedGear|Snowfall");
-			
-			
 
 			if (getBoolean("altShovelRecipe", false)) {
 				GameRegistry.addRecipe(new ShapedOreRecipe(itemToolSnowshovelWood, new Object[] {"PPP", "PXP", " S ",
-						'P', "plankWood", 'S', Item.stick, 'X', Item.shovelWood }));
+						'P', "plankWood", 'S', Items.stick, 'X', Items.wooden_shovel }));
 				GameRegistry.addRecipe(new ShapedOreRecipe(itemToolSnowshovelStone, new Object[] {"PPP", "PXP", " S ",
-						'P', Block.cobblestone, 'S', Item.stick, 'X', Item.shovelWood }));
+						'P', Blocks.cobblestone, 'S', Items.stick, 'X', Items.wooden_shovel }));
 				GameRegistry.addRecipe(new ShapedOreRecipe(itemToolSnowshovelBronze, new Object[] {"PPP", "PXP", " S ",
-						'P', "ingotBronze", 'S', Item.stick, 'X', Item.shovelWood }));
+						'P', "ingotBronze", 'S', Items.stick, 'X', Items.wooden_shovel }));
 				GameRegistry.addRecipe(new ShapedOreRecipe(itemToolSnowshovelIron, new Object[] {"PPP", "PXP", " S ",
-						'P', Item.ingotIron, 'S', Item.stick, 'X', Item.shovelWood }));
+						'P', Items.iron_ingot, 'S', Items.stick, 'X', Items.wooden_shovel }));
 				GameRegistry.addRecipe(new ShapedOreRecipe(itemToolSnowshovelSteel, new Object[] {"PPP", "PXP", " S ",
-						'P', "ingotSteel", 'S', Item.stick, 'X', Item.shovelWood }));
+						'P', "ingotSteel", 'S', Items.stick, 'X', Items.wooden_shovel }));
 				GameRegistry.addRecipe(new ShapedOreRecipe(itemToolSnowshovelDiamond, new Object[] {"PPP", "PXP",
-						" S ", 'P', Item.diamond, 'S', Item.stick, 'X', Item.shovelWood }));
+						" S ", 'P', Items.diamond, 'S', Items.stick, 'X', Items.wooden_shovel }));
 				GameRegistry.addRecipe(new ShapedOreRecipe(itemToolSnowshovelGold, new Object[] {"PPP", "PXP", " S ",
-						'P', Item.ingotGold, 'S', Item.stick, 'X', Item.shovelWood }));
+						'P', Items.gold_ingot, 'S', Items.stick, 'X', Items.wooden_shovel }));
 			} else {
 				GameRegistry.addRecipe(new ShapedOreRecipe(itemToolSnowshovelWood, new Object[] {"PPP", "PSP", " S ",
-						'P', "plankWood", 'S', Item.stick }));
+						'P', "plankWood", 'S', Items.stick }));
 				GameRegistry.addRecipe(new ShapedOreRecipe(itemToolSnowshovelStone, new Object[] {"PPP", "PSP", " S ",
-						'P', Block.cobblestone, 'S', Item.stick }));
+						'P', Blocks.cobblestone, 'S', Items.stick }));
 				GameRegistry.addRecipe(new ShapedOreRecipe(itemToolSnowshovelBronze, new Object[] {"PPP", "PSP", " S ",
-						'P', "ingotBronze", 'S', Item.stick }));
+						'P', "ingotBronze", 'S', Items.stick }));
 				GameRegistry.addRecipe(new ShapedOreRecipe(itemToolSnowshovelIron, new Object[] {"PPP", "PSP", " S ",
-						'P', Item.ingotIron, 'S', Item.stick }));
+						'P', Items.iron_ingot, 'S', Items.stick }));
 				GameRegistry.addRecipe(new ShapedOreRecipe(itemToolSnowshovelSteel, new Object[] {"PPP", "PSP", " S ",
-						'P', "ingotSteel", 'S', Item.stick }));
+						'P', "ingotSteel", 'S', Items.stick }));
 				GameRegistry.addRecipe(new ShapedOreRecipe(itemToolSnowshovelDiamond, new Object[] {"PPP", "PSP",
-						" S ", 'P', Item.diamond, 'S', Item.stick }));
+						" S ", 'P', Items.diamond, 'S', Items.stick }));
 				GameRegistry.addRecipe(new ShapedOreRecipe(itemToolSnowshovelGold, new Object[] {"PPP", "PSP", " S ",
-						'P', Item.ingotGold, 'S', Item.stick }));
+						'P', Items.gold_ingot, 'S', Items.stick }));
 			}
 		}
 
 		if (getBoolean("snowGolemRecipe") && Loader.isModLoaded("NotEnoughItems")) //NEI makes the monster placer usable. It's worthless without it
-			GameRegistry.addRecipe(new ItemStack(Item.monsterPlacer, 1, 97), new Object[] {" J ", "SBS", " B ", 'J',
-					Block.pumpkinLantern, 'S', Item.stick, 'B', Block.blockSnow });
+			GameRegistry.addRecipe(new ItemStack(Items.spawn_egg, 1, 97), new Object[] {" J ", "SBS", " B ", 'J',
+					Blocks.lit_pumpkin, 'S', Items.stick, 'B', Blocks.snow });
 
 		if (getBoolean("snowBlockFromLayerRecipe"))
-			GameRegistry.addRecipe(new ItemStack(Block.blockSnow), new Object[] {"LL", "LL", 'L', Block.snow });
+			GameRegistry.addRecipe(new ItemStack(Blocks.snow), new Object[] {"LL", "LL", 'L', Blocks.snow_layer });
 
 	}
 

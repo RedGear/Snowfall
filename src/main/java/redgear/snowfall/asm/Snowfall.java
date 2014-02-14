@@ -18,10 +18,10 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-@Mod(modid = "RedGear|Snowfall", name = "Snowfall", version = "@ModVersion@", dependencies = "required-after:RedGear|Core;")
+@Mod(modid = "redgear_snowfall", name = "Snowfall", version = "@ModVersion@", dependencies = "required-after:redgear_core;")
 public class Snowfall extends ModUtils {
 
-	@Instance("RedGear|Snowfall")
+	@Instance("redgear_snowfall")
 	public static ModUtils inst;
 	public static Item itemToolSnowshovelWood;
 	public static Item itemToolSnowshovelStone;
@@ -33,6 +33,7 @@ public class Snowfall extends ModUtils {
 
 	@Override
 	public void PreInit(FMLPreInitializationEvent event) {
+		new SnowfallHooks();
 
 		if (getBoolean("snowShovels")) {
 			ToolMaterial toolMaterialBronze = EnumHelper.addToolMaterial("Bronze", 2, 131, 5.0F, 2, 18);

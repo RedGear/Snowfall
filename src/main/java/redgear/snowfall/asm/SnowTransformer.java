@@ -123,7 +123,7 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 			return writer.toByteArray();
 		}
 
-		if (transformedName.equals("net.minecraft.block.BlockSnowBlock")
+		/*if (transformedName.equals("net.minecraft.block.BlockSnowBlock")
 				&& RedGearCore.util.getBoolean("SnowfallShovelHook")) {
 			ClassReader reader = new ClassReader(bytes);
 			ClassNode node = new ClassNode();
@@ -165,7 +165,7 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 			ClassWriter writer = new ClassWriter(0);
 			node.accept(writer);
 			return writer.toByteArray();
-		}
+		}*/
 
 		if (transformedName.equals("net.minecraft.block.BlockSnow")
 				&& (RedGearCore.util.getBoolean("SnowGrowthAndDecay")
@@ -183,7 +183,7 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 			updateTick.add(new MethodInsnNode(INVOKESTATIC, snowfallHooks, "updateTick", "(" + worldName
 					+ "IIILjava/util/Random;)V")); // call the updateTick method from the SnowTransformer class
 			updateTick.add(new InsnNode(RETURN));
-			InsnList harvestBlock = new InsnList();
+			/*InsnList harvestBlock = new InsnList();
 			LabelNode skip = new LabelNode();
 			harvestBlock.add(new VarInsnNode(ALOAD, 1));
 			harvestBlock.add(new VarInsnNode(ALOAD, 2));
@@ -196,7 +196,7 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 					+ playerName + "IIIIZ)Z"));
 			harvestBlock.add(new JumpInsnNode(IFEQ, skip));
 			harvestBlock.add(new InsnNode(RETURN));
-			harvestBlock.add(skip);
+			harvestBlock.add(skip);*/
 			InsnList canPlaceBlockAt = new InsnList();
 			canPlaceBlockAt.add(new VarInsnNode(ALOAD, 1));
 			canPlaceBlockAt.add(new VarInsnNode(ILOAD, 2));
@@ -211,8 +211,8 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 				if ("func_149674_a".equals(mappedName) && RedGearCore.util.getBoolean("SnowGrowthAndDecay"))//func_71847_b
 					method.instructions = updateTick;//func_149674_a
 
-				if ("func_149636_a".equals(mappedName) && RedGearCore.util.getBoolean("SnowfallShovelHook"))//func_71893_a
-					method.instructions.insertBefore(method.instructions.getFirst(), harvestBlock);
+				/*if ("func_149636_a".equals(mappedName) && RedGearCore.util.getBoolean("SnowfallShovelHook"))//func_71893_a
+					method.instructions.insertBefore(method.instructions.getFirst(), harvestBlock);*/
 
 				if ("func_149742_c".equals(mappedName) && RedGearCore.util.getBoolean("SnowPlaceOnSolidSide"))//func_71930_b
 					method.instructions = canPlaceBlockAt;

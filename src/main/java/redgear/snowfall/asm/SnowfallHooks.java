@@ -4,18 +4,25 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import redgear.core.util.SimpleItem;
 import redgear.core.world.WorldLocation;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class SnowfallHooks {
+
+	public SnowfallHooks() {
+		MinecraftForge.EVENT_BUS.register(this);
+	}
+
 	public static void updateTick(World world, int x, int y, int z, Random rand) {
 		WorldLocation loc = new WorldLocation(x, y, z, world);
 
@@ -105,33 +112,20 @@ public class SnowfallHooks {
 	 * @param meta
 	 * @return true if the player was holding a snowshovel, false otherwise
 	 */
-	public static boolean snowShovelHook(World world, EntityPlayer player, int x, int y, int z, int meta,
-			boolean isLayered) {
-		ItemStack heldItem = player.getHeldItem();
+	@SubscribeEvent
+	public void snowShovelHook(HarvestDropsEvent event) {
+		if (event.block == Blocks.snow || event.block == Blocks.snow_layer) {
+			ItemStack heldItem = event.harvester.getHeldItem();
 
-		if (heldItem != null && heldItem.getItem() instanceof ISnowShovel && !world.isRemote
-				&& world.getGameRules().getGameRuleBooleanValue("doTileDrops")) {
-			float f = 0.7F;
-			double d0 = world.rand.nextFloat() * f + (1.0F - f) * 0.5D;
-			double d1 = world.rand.nextFloat() * f + (1.0F - f) * 0.5D;
-			double d2 = world.rand.nextFloat() * f + (1.0F - f) * 0.5D;
-			EntityItem entityitem = null;
+			if (heldItem != null && heldItem.getItem() instanceof ISnowShovel) {
+				event.drops.clear();
 
-			if (isLayered)
-				entityitem = new EntityItem(world, x + d0, y + d1, z + d2,
-						new ItemStack(Blocks.snow_layer, meta + 1, 0));
-			else
-				entityitem = new EntityItem(world, x + d0, y + d1, z + d2, new ItemStack(Blocks.snow, 1, 0));
-
-			if (entityitem != null) {
-				entityitem.delayBeforeCanPickup = 10;
-				world.spawnEntityInWorld(entityitem);
+				if (event.block == Blocks.snow_layer)
+					event.drops.add(new ItemStack(Blocks.snow_layer, event.blockMetadata + 1, 0));
+				else
+					event.drops.add(new ItemStack(Blocks.snow, 1, 0));
 			}
-
-			world.setBlockToAir(x, y, z);
-			return true;
-		} else
-			return false;
+		}
 	}
 
 	public interface ISnowShovel {

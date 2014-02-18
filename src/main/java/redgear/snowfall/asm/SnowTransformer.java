@@ -1,21 +1,16 @@
 package redgear.snowfall.asm;
 
-import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.FLOAD;
-import static org.objectweb.asm.Opcodes.ICONST_0;
 import static org.objectweb.asm.Opcodes.ICONST_1;
 import static org.objectweb.asm.Opcodes.ICONST_2;
-import static org.objectweb.asm.Opcodes.IFEQ;
 import static org.objectweb.asm.Opcodes.IFNE;
 import static org.objectweb.asm.Opcodes.IF_ICMPNE;
 import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.IRETURN;
 import static org.objectweb.asm.Opcodes.ISTORE;
-import static org.objectweb.asm.Opcodes.POP;
 import static org.objectweb.asm.Opcodes.RETURN;
 
 import java.util.Map;
@@ -55,8 +50,9 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 			canSnowAtBody.add(new VarInsnNode(ILOAD, 1));
 			canSnowAtBody.add(new VarInsnNode(ILOAD, 2));
 			canSnowAtBody.add(new VarInsnNode(ILOAD, 3));
+			canSnowAtBody.add(new VarInsnNode(ILOAD, 4));
 			canSnowAtBody.add(new MethodInsnNode(INVOKESTATIC, snowfallHooks, "canSnowAtBody", "(" + worldName
-					+ "III)Z"));
+					+ "IIIZ)Z"));
 			canSnowAtBody.add(new InsnNode(IRETURN));
 
 			for (MethodNode mn : node.methods)
@@ -123,50 +119,6 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 			return writer.toByteArray();
 		}
 
-		/*if (transformedName.equals("net.minecraft.block.BlockSnowBlock")
-				&& RedGearCore.util.getBoolean("SnowfallShovelHook")) {
-			ClassReader reader = new ClassReader(bytes);
-			ClassNode node = new ClassNode();
-			reader.accept(node, 0);
-			InsnList harvestBlock = new InsnList();
-			LabelNode skip = new LabelNode();
-			harvestBlock.add(new VarInsnNode(ALOAD, 1));
-			harvestBlock.add(new VarInsnNode(ALOAD, 2));
-			harvestBlock.add(new VarInsnNode(ILOAD, 3));
-			harvestBlock.add(new VarInsnNode(ILOAD, 4));
-			harvestBlock.add(new VarInsnNode(ILOAD, 5));
-			harvestBlock.add(new VarInsnNode(ILOAD, 6));
-			harvestBlock.add(new InsnNode(ICONST_0));
-			harvestBlock.add(new MethodInsnNode(INVOKESTATIC, snowfallHooks, "snowShovelHook", "(" + worldName
-					+ playerName + "IIIIZ)Z"));
-			harvestBlock.add(new JumpInsnNode(IFEQ, skip));
-			harvestBlock.add(new InsnNode(RETURN));
-			harvestBlock.add(skip);
-			harvestBlock.add(new VarInsnNode(ALOAD, 0));
-			harvestBlock.add(new VarInsnNode(ALOAD, 1));
-			harvestBlock.add(new VarInsnNode(ALOAD, 2));
-			harvestBlock.add(new VarInsnNode(ILOAD, 3));
-			harvestBlock.add(new VarInsnNode(ILOAD, 4));
-			harvestBlock.add(new VarInsnNode(ILOAD, 5));
-			harvestBlock.add(new VarInsnNode(ILOAD, 6));
-			harvestBlock.add(new MethodInsnNode(INVOKESPECIAL, node.superName, "harvestBlock", "(" + worldName
-					+ playerName + "IIII)V"));
-			harvestBlock.add(new VarInsnNode(ALOAD, 1));
-			harvestBlock.add(new VarInsnNode(ILOAD, 3));
-			harvestBlock.add(new VarInsnNode(ILOAD, 4));
-			harvestBlock.add(new VarInsnNode(ILOAD, 5));
-			harvestBlock.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/World", "setBlockToAir", "(III)Z"));
-			harvestBlock.add(new InsnNode(POP));
-			harvestBlock.add(new InsnNode(RETURN));
-			MethodNode mn = new MethodNode(ACC_PUBLIC, "harvestBlock", "(" + worldName + playerName + "IIII)V", null,
-					new String[] {});
-			mn.instructions = harvestBlock;
-			node.methods.add(mn);
-			ClassWriter writer = new ClassWriter(0);
-			node.accept(writer);
-			return writer.toByteArray();
-		}*/
-
 		if (transformedName.equals("net.minecraft.block.BlockSnow")
 				&& (RedGearCore.util.getBoolean("SnowGrowthAndDecay")
 						|| RedGearCore.util.getBoolean("SnowPlaceOnSolidSide") || RedGearCore.util
@@ -183,20 +135,6 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 			updateTick.add(new MethodInsnNode(INVOKESTATIC, snowfallHooks, "updateTick", "(" + worldName
 					+ "IIILjava/util/Random;)V")); // call the updateTick method from the SnowTransformer class
 			updateTick.add(new InsnNode(RETURN));
-			/*InsnList harvestBlock = new InsnList();
-			LabelNode skip = new LabelNode();
-			harvestBlock.add(new VarInsnNode(ALOAD, 1));
-			harvestBlock.add(new VarInsnNode(ALOAD, 2));
-			harvestBlock.add(new VarInsnNode(ILOAD, 3));
-			harvestBlock.add(new VarInsnNode(ILOAD, 4));
-			harvestBlock.add(new VarInsnNode(ILOAD, 5));
-			harvestBlock.add(new VarInsnNode(ILOAD, 6));
-			harvestBlock.add(new InsnNode(ICONST_1));
-			harvestBlock.add(new MethodInsnNode(INVOKESTATIC, snowfallHooks, "snowShovelHook", "(" + worldName
-					+ playerName + "IIIIZ)Z"));
-			harvestBlock.add(new JumpInsnNode(IFEQ, skip));
-			harvestBlock.add(new InsnNode(RETURN));
-			harvestBlock.add(skip);*/
 			InsnList canPlaceBlockAt = new InsnList();
 			canPlaceBlockAt.add(new VarInsnNode(ALOAD, 1));
 			canPlaceBlockAt.add(new VarInsnNode(ILOAD, 2));
@@ -210,9 +148,6 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 				String mappedName = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(name, method.name, method.desc);
 				if ("func_149674_a".equals(mappedName) && RedGearCore.util.getBoolean("SnowGrowthAndDecay"))//func_71847_b
 					method.instructions = updateTick;//func_149674_a
-
-				/*if ("func_149636_a".equals(mappedName) && RedGearCore.util.getBoolean("SnowfallShovelHook"))//func_71893_a
-					method.instructions.insertBefore(method.instructions.getFirst(), harvestBlock);*/
 
 				if ("func_149742_c".equals(mappedName) && RedGearCore.util.getBoolean("SnowPlaceOnSolidSide"))//func_71930_b
 					method.instructions = canPlaceBlockAt;

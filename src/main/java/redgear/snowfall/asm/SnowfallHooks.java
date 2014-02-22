@@ -46,7 +46,7 @@ public class SnowfallHooks {
 
 	//Block below must be soid, with leaves being an exception. 
 	public static boolean canPlaceBlockAt(WorldLocation loc) {
-		if (loc.getBlock() == Blocks.snow_layer || loc.isAir() || loc.getMaterial() == Material.plants) {//This block
+		if (loc.getBlock() == Blocks.snow_layer || loc.isAir() || loc.getMaterial() == Material.plants || loc.getMaterial() == Material.vine) {//This block
 
 			loc = loc.translate(ForgeDirection.DOWN, 1);
 

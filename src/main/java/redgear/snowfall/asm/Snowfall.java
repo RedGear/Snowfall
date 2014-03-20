@@ -22,6 +22,8 @@ public class Snowfall extends ModUtils {
 
 	@Instance("RedGear|Snowfall")
 	public static ModUtils inst;
+	public static boolean deepSnow;
+	public static boolean iceAge;
 	public static Item itemToolSnowshovelWood;
 	public static Item itemToolSnowshovelStone;
 	public static Item itemToolSnowshovelBronze;
@@ -36,6 +38,10 @@ public class Snowfall extends ModUtils {
 
 	@Override
 	public void PreInit(FMLPreInitializationEvent event) {
+		
+		
+		deepSnow = getBoolean("DeepSnow", false );
+		iceAge = getBoolean("IceAgeMode", false);
 
 		if (getBoolean("snowShovels")) {
 			EnumToolMaterial toolMaterialBronze = EnumHelper.addToolMaterial("Bronze", 2, 131, 5.0F, 2, 18);

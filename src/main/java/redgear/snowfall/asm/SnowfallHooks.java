@@ -5,38 +5,35 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
-import redgear.core.api.world.ILocation;
 import redgear.core.util.SimpleItem;
-import redgear.core.world.Location;
+import redgear.core.world.WorldLocation;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class SnowfallHooks {
 
-	static {
-		MinecraftForge.EVENT_BUS.register(new SnowfallHooks());
-	}
-
-	private SnowfallHooks() {
+	public SnowfallHooks() {
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	public static void updateTick(World world, int x, int y, int z, Random rand) {
-		Location loc = new Location(x, y, z);
+		WorldLocation loc = new WorldLocation(x, y, z, world);
 
-		int meta = loc.getBlockMeta(world);
+		int meta = loc.getBlockMeta();
 		int k1 = meta & 7;
 
 		if (world.getSavedLightValue(EnumSkyBlock.Block, x, y, z) > 11)
 			if (meta < 1)
-				world.setBlockToAir(loc.getX(), loc.getY(), loc.getZ());
+				loc.setAir();
 			else
-				loc.placeBlock(world, new SimpleItem(Block.snow.blockID, k1 - 1));
+				loc.placeBlock(new SimpleItem(Blocks.snow_layer, k1 - 1));
 		//else
 
 		//if (meta < 7 && world.isRaining() && rand.nextInt(8) + 1 > 7 && world.canBlockSeeTheSky(x, y, z))
@@ -44,108 +41,112 @@ public class SnowfallHooks {
 	}
 
 	public static boolean canPlaceBlockAt(World world, int x, int y, int z) {
-		return canPlaceBlockAt(world, new Location(x, y, z));
+		return canPlaceBlockAt(new WorldLocation(x, y, z, world));
 	}
 
 	//Block below must be soid, with leaves being an exception. 
-	public static boolean canPlaceBlockAt(World world, ILocation loc) {
-		int id = loc.getBlockId(world);
-		Block block = Block.blocksList[id];
-
-		if (id == Block.snow.blockID || loc.isAir(world) || block.blockMaterial == Material.plants
-				|| block.blockMaterial == Material.vine) {//This block
+	public static boolean canPlaceBlockAt(WorldLocation loc) {
+		if (loc.getBlock() == Blocks.snow_layer || loc.isAir() || loc.getMaterial() == Material.plants || loc.getMaterial() == Material.vine) {//This block
 
 			loc = loc.translate(ForgeDirection.DOWN, 1);
-			id = loc.getBlockId(world);
-			block = Block.blocksList[id];
-			return block != null && (
-					world.isBlockSolidOnSide(loc.getX(), loc.getY(), loc.getZ(), ForgeDirection.UP)//Block below.
-					|| block.isLeaves(world, loc.getX(), loc.getY(), loc.getZ()) 
-					|| id == Block.tilledField.blockID);
+
+			return loc.isSideSolid(ForgeDirection.UP)//Block below.
+					|| loc.getBlock().isLeaves(loc.world, loc.getX(), loc.getY(), loc.getZ())
+					|| loc.getBlock() == Blocks.farmland;
 		} else
 			return false;
 	}
 
-	public static boolean canSnowAtBody(World world, int x, int y, int z) {
-		ILocation loc = new Location(x, y, z);
+	public static boolean canSnowAtBody(World world, int x, int y, int z, boolean checkLight) {
+		WorldLocation loc = new WorldLocation(x, y, z, world);
 		BiomeGenBase biomegenbase = world.getBiomeGenForCoords(x, z);
-		float f = biomegenbase.getFloatTemperature();
+		float f = biomegenbase.getFloatTemperature(x, y, z);
 
 		if (f > 0.15F)
 			return false;
-		else if (world.getSavedLightValue(EnumSkyBlock.Block, x, y, z) < 10) {
-			int block = loc.getBlockId(world);
+		else if (!checkLight)
+			return true;
+		else 
+			if (world.getSavedLightValue(EnumSkyBlock.Block, x, y, z) < 10) {
+				Block block = loc.getBlock();
 
-			if (block == Block.snow.blockID) { //grow the snow. 
-				int smallest = loc.getBlockMeta(world);
+				if (block == Blocks.snow_layer) { //grow the snow. 
+					int smallest = loc.getBlockMeta();
 
-				if (smallest == 7) {
-					if (Snowfall.deepSnow || Snowfall.iceAge) {
+					if (smallest == 7) {
+						if (Snowfall.deepSnow || Snowfall.iceAge) {
+							loc = loc.translate(-1, 0, -1);
+
+							for (int i = 0; i < 3; i++)
+								for (int j = 0; j < 3; j++)
+									deepSnow(loc.translate(i, 0, j));
+						}
+						return false;
+					}
+
+					if (world.rand.nextInt(smallest + 2) == 0) {
 						loc = loc.translate(-1, 0, -1);
 
 						for (int i = 0; i < 3; i++)
 							for (int j = 0; j < 3; j++)
-								deepSnow(world, loc.translate(i, 0, j));
+								smallest = findSmallest(loc.translate(i, 0, j), smallest);
+
+						for (int i = 0; i < 3; i++)
+							for (int j = 0; j < 3; j++)
+								grow(loc.translate(i, 0, j), smallest);
 					}
 					return false;
+
 				}
 
-				if (world.rand.nextInt(smallest + 2) == 0) {
-					loc = loc.translate(-1, 0, -1);
-
-					for (int i = 0; i < 3; i++)
-						for (int j = 0; j < 3; j++)
-							smallest = findSmallest(world, loc.translate(i, 0, j), smallest);
-
-					for (int i = 0; i < 3; i++)
-						for (int j = 0; j < 3; j++)
-							grow(world, loc.translate(i, 0, j), smallest);
-				}
-				return false;
-
+				return canPlaceBlockAt(world, x, y, z);
 			}
-
-			return canPlaceBlockAt(world, x, y, z);
-		} else
-			return false;
+			else
+				return false;
 	}
 
-	private static void deepSnow(World world, ILocation loc) {
-		if (loc.getBlockMeta(world) == 7) {
+	private static void deepSnow(WorldLocation loc) {
+		if (loc.getBlockMeta() == 7) {
 			if (Snowfall.deepSnow && !Snowfall.iceAge)
-				if (!checkDeepSnow(world, loc.translate(ForgeDirection.DOWN, 2)))
-					loc.placeBlock(world, new SimpleItem(Block.blockSnow));
+				if (!checkDeepSnow(loc.translate(ForgeDirection.DOWN, 2)))
+					loc.placeBlock(new SimpleItem(Blocks.snow));
 
 			if (Snowfall.iceAge) {
-				if (!(loc.translate(ForgeDirection.DOWN, 6).getBlockId(world) == Block.ice.blockID))
-					loc.placeBlock(world, new SimpleItem(Block.blockSnow));
+				if (!(loc.translate(ForgeDirection.DOWN, 6).getBlock() == Blocks.packed_ice))
+					loc.placeBlock(new SimpleItem(Blocks.snow));
 
 				loc = loc.translate(ForgeDirection.DOWN, 3);
-				if (loc.getBlockId(world) == Block.blockSnow.blockID)
-					loc.placeBlock(world, new SimpleItem(Block.ice));
+				if (loc.getBlock() == Blocks.snow) {
+					loc.placeBlock(new SimpleItem(Blocks.ice));
+
+					loc = loc.translate(ForgeDirection.DOWN, 2);
+					if (loc.getBlock() == Blocks.ice)
+						loc.placeBlock(new SimpleItem(Blocks.packed_ice));
+
+				}
 
 			}
 		}
 	}
 
-	private static boolean checkDeepSnow(World world, ILocation loc) {
-		Material mat = loc.getBlockMaterial(world);
-		return mat == Material.snow ? true : mat == Material.craftedSnow ? true : mat == Material.ice;
+	private static boolean checkDeepSnow(WorldLocation loc) {
+		Material mat = loc.getMaterial();
+		return mat == Material.snow ? true : mat == Material.craftedSnow ? true : mat == Material.ice ? true
+				: mat == Material.packedIce;
 	}
 
-	private static int findSmallest(World world, ILocation loc, int smallest) {
-		if (loc.getBlockId(world) == Block.snow.blockID)
-			return Math.min(loc.getBlockMeta(world), smallest);
-		else if (canPlaceBlockAt(world, loc))
+	private static int findSmallest(WorldLocation loc, int smallest) {
+		if (loc.getBlock() == Blocks.snow_layer)
+			return Math.min(loc.getBlockMeta(), smallest);
+		else if (canPlaceBlockAt(loc))
 			return -1;
 		else
 			return smallest;
 	}
 
-	private static void grow(World world, ILocation loc, int test) {
-		if (loc.getBlockId(world) == Block.snow.blockID && loc.getBlockMeta(world) == test || test == -1
-				&& canPlaceBlockAt(world, loc))
-			loc.placeBlock(world, new SimpleItem(Block.snow.blockID, test + 1));
+	private static void grow(WorldLocation loc, int test) {
+		if (loc.getBlock() == Blocks.snow_layer && loc.getBlockMeta() == test || test == -1 && canPlaceBlockAt(loc))
+			loc.placeBlock(new SimpleItem(Blocks.snow_layer, test + 1));
 	}
 
 	/**
@@ -156,7 +157,7 @@ public class SnowfallHooks {
 	 */
 	public static int onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side,
 			float par8, float par9, float par10) {
-		ILocation loc = new Location(x, y, z);
+		WorldLocation loc = new WorldLocation(x, y, z, world);
 
 		if (stack.stackSize == 0)
 			return 1;
@@ -164,16 +165,16 @@ public class SnowfallHooks {
 		if (!player.canPlayerEdit(x, y, z, side, stack))
 			return 1;
 
-		int target = loc.getBlockId(world);
-		Block snow = Block.snow;
+		Block target = loc.getBlock();
+		Block snow = Blocks.snow_layer;
 
-		if (target == snow.blockID) {
-			int meta = loc.getBlockMeta(world);
+		if (target == snow) {
+			int meta = loc.getBlockMeta();
 
 			if (meta <= 6) {
 				if (world.checkNoEntityCollision(snow.getCollisionBoundingBoxFromPool(world, x, y, z))
 						&& world.setBlockMetadataWithNotify(x, y, z, meta + 1, 2)) {
-					world.playSoundEffect(x + 0.5F, y + 0.5F, z + 0.5F, snow.stepSound.getBreakSound(),
+					world.playSoundEffect(x + 0.5F, y + 0.5F, z + 0.5F, snow.stepSound.func_150496_b(),
 							(snow.stepSound.getVolume() + 1.0F) / 2.0F, snow.stepSound.getPitch() * 0.8F);
 					--stack.stackSize;
 
@@ -196,19 +197,19 @@ public class SnowfallHooks {
 	 * @param meta
 	 * @return true if the player was holding a snowshovel, false otherwise
 	 */
-	@ForgeSubscribe
+	@SubscribeEvent
 	public void snowShovelHook(HarvestDropsEvent event) {
 		if (event.harvester != null)
-			if (event.block == Block.blockSnow || event.block == Block.snow) {
+			if (event.block == Blocks.snow || event.block == Blocks.snow_layer) {
 				ItemStack heldItem = event.harvester.getHeldItem();
 
 				if (heldItem != null && heldItem.getItem() instanceof ISnowShovel) {
 					event.drops.clear();
 
-					if (event.block == Block.snow)
-						event.drops.add(new ItemStack(Block.snow, event.blockMetadata + 1, 0));
+					if (event.block == Blocks.snow_layer)
+						event.drops.add(new ItemStack(Blocks.snow_layer, event.blockMetadata + 1, 0));
 					else
-						event.drops.add(new ItemStack(Block.blockSnow, 1, 0));
+						event.drops.add(new ItemStack(Blocks.snow, 1, 0));
 				}
 			}
 	}

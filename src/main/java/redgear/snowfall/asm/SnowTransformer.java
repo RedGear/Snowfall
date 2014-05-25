@@ -29,7 +29,6 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import redgear.core.asm.CoreLoadingPlugin;
 import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
@@ -41,7 +40,7 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] bytes) {
-		if (transformedName.equals("net.minecraft.world.World") && CoreLoadingPlugin.util.getBoolean("SnowOnIce")) {
+		if (transformedName.equals("net.minecraft.world.World") /*&& CoreLoadingPlugin.util.getBoolean("SnowOnIce")*/) {
 			ClassReader reader = new ClassReader(bytes);
 			ClassNode node = new ClassNode();
 			reader.accept(node, 0);
@@ -64,7 +63,7 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 			return writer.toByteArray();
 		}
 
-		if (transformedName.equals("net.minecraft.item.ItemSnow") && CoreLoadingPlugin.util.getBoolean("SnowLayerStackFix")) {
+		if (transformedName.equals("net.minecraft.item.ItemSnow") /*&& CoreLoadingPlugin.util.getBoolean("SnowLayerStackFix")*/) {
 			ClassReader reader = new ClassReader(bytes);
 			ClassNode node = new ClassNode();
 			reader.accept(node, 0);
@@ -120,9 +119,9 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 		}
 
 		if (transformedName.equals("net.minecraft.block.BlockSnow")
-				&& (CoreLoadingPlugin.util.getBoolean("SnowGrowthAndDecay")
+				/*&& (CoreLoadingPlugin.util.getBoolean("SnowGrowthAndDecay")
 						|| CoreLoadingPlugin.util.getBoolean("SnowPlaceOnSolidSide") || CoreLoadingPlugin.util
-							.getBoolean("SnowfallShovelHook"))) {
+							.getBoolean("SnowfallShovelHook"))*/) {
 			ClassReader reader = new ClassReader(bytes);
 			ClassNode node = new ClassNode();
 			reader.accept(node, 0);
@@ -146,10 +145,10 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 
 			for (MethodNode method : node.methods) {
 				String mappedName = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(name, method.name, method.desc);
-				if ("func_149674_a".equals(mappedName) && CoreLoadingPlugin.util.getBoolean("SnowGrowthAndDecay"))//func_71847_b
+				if ("func_149674_a".equals(mappedName) /*&& CoreLoadingPlugin.util.getBoolean("SnowGrowthAndDecay")*/)//func_71847_b
 					method.instructions = updateTick;//func_149674_a
 
-				if ("func_149742_c".equals(mappedName) && CoreLoadingPlugin.util.getBoolean("SnowPlaceOnSolidSide"))//func_71930_b
+				if ("func_149742_c".equals(mappedName) /*&& CoreLoadingPlugin.util.getBoolean("SnowPlaceOnSolidSide")*/)//func_71930_b
 					method.instructions = canPlaceBlockAt;
 			}
 

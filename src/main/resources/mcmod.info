@@ -1,0 +1,17 @@
+[
+{
+  "modid": "redgear_snowfall",
+  "name": "Snowfall",
+  "description": "Let it snow, let it snow let it snow .....",
+  "version": "${version}",
+  "credits": "Created by Team Red Gear",
+  "logoFile": "",
+  "mcversion": "${minecraft_version}",
+  "url": "http://curse.com/project/59703",
+  "updateUrl": "",
+  "authors": [ "LordBlackHole"],
+  "parent":"",
+  "screenshots": [],
+  "dependencies": ["redgear_core"]
+}
+]

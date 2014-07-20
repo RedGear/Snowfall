@@ -172,7 +172,7 @@ public class SnowTransformer implements IClassTransformer, IFMLLoadingPlugin {
 
 	@Override
 	public String getSetupClass() {
-		return null;
+		return redgear.snowfall.codechicken.DepLoader.class.getName();
 	}
 
 	@Override

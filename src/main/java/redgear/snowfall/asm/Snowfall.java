@@ -5,6 +5,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import redgear.core.mod.ModUtils;
@@ -24,8 +25,12 @@ public class Snowfall extends ModUtils {
 	@Instance("redgear_snowfall")
 	public static ModUtils inst;
 	public static boolean deepSnow;
+	public static boolean veryDeepSnow;
 	public static boolean iceAge;
-	
+	public static boolean snowShovels;
+	public static boolean snowGolemRecipe;
+	public static boolean snowBlockFromLayerRecipe;
+
 	public static Item itemToolSnowshovelWood;
 	public static Item itemToolSnowshovelStone;
 	public static Item itemToolSnowshovelBronze;
@@ -37,11 +42,10 @@ public class Snowfall extends ModUtils {
 	@Override
 	public void PreInit(FMLPreInitializationEvent event) {
 		new SnowfallHooks();
-		
-		deepSnow = getBoolean("DeepSnow", false );
-		iceAge = getBoolean("IceAgeMode", false);
 
-		if (getBoolean("snowShovels")) {
+		syncConfig();
+
+		if (snowShovels) {
 			ToolMaterial toolMaterialBronze = EnumHelper.addToolMaterial("Bronze", 2, 131, 5.0F, 2, 18);
 			ToolMaterial toolMaterialSteel = EnumHelper.addToolMaterial("Steel", 2, 500, 7.0F, 4, 10);
 			itemToolSnowshovelWood = new ItemSnowShovel(ToolMaterial.WOOD).setUnlocalizedName("snowShovelWood");
@@ -51,7 +55,7 @@ public class Snowfall extends ModUtils {
 			itemToolSnowshovelIron = new ItemSnowShovel(ToolMaterial.IRON).setUnlocalizedName("snowShovelIron");
 			itemToolSnowshovelSteel = new ItemSnowShovel(toolMaterialSteel).setUnlocalizedName("snowShovelSteel");
 			itemToolSnowshovelDiamond = new ItemSnowShovel(ToolMaterial.EMERALD)
-					.setUnlocalizedName("snowShovelDiamond");
+			.setUnlocalizedName("snowShovelDiamond");
 			itemToolSnowshovelGold = new ItemSnowShovel(ToolMaterial.GOLD).setUnlocalizedName("snowShovelGold");
 
 			GameRegistry.registerItem(itemToolSnowshovelStone, "snowShovelWood", "RedGear|Snowfall");
@@ -95,11 +99,11 @@ public class Snowfall extends ModUtils {
 			}
 		}
 
-		if (getBoolean("snowGolemRecipe") && Loader.isModLoaded("NotEnoughItems")) //NEI makes the monster placer usable. It's worthless without it
+		if (snowGolemRecipe && Loader.isModLoaded("NotEnoughItems")) //NEI makes the monster placer usable. It's worthless without it
 			GameRegistry.addRecipe(new ItemStack(Items.spawn_egg, 1, 97), new Object[] {" J ", "SBS", " B ", 'J',
-					Blocks.lit_pumpkin, 'S', Items.stick, 'B', Blocks.snow });
+				Blocks.lit_pumpkin, 'S', Items.stick, 'B', Blocks.snow });
 
-		if (getBoolean("snowBlockFromLayerRecipe"))
+		if (snowBlockFromLayerRecipe)
 			GameRegistry.addRecipe(new ItemStack(Blocks.snow), new Object[] {"LL", "LL", 'L', Blocks.snow_layer });
 
 	}
@@ -111,7 +115,22 @@ public class Snowfall extends ModUtils {
 
 	@Override
 	protected void PostInit(FMLPostInitializationEvent event) {
+		if (iceAge)
+			for (BiomeGenBase biome : BiomeGenBase.getBiomeGenArray())
+				if (biome != null){
+					biome.temperature = .15f;
+					biome.setEnableSnow();
+				}
+					
+	}
 
+	protected void syncConfig() {
+		deepSnow = getBoolean("DeepSnow", false);
+		veryDeepSnow = getBoolean("veryDeepSnow", false);
+		iceAge = getBoolean("IceAgeMode", false);
+		snowShovels = getBoolean("snowShovels");
+		snowGolemRecipe = getBoolean("snowGolemRecipe");
+		snowBlockFromLayerRecipe = getBoolean("snowBlockFromLayerRecipe");
 	}
 
 	@Override

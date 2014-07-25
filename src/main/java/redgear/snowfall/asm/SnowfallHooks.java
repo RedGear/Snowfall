@@ -74,7 +74,7 @@ public class SnowfallHooks {
 					int smallest = loc.getBlockMeta();
 
 					if (smallest == 7) {
-						if (Snowfall.deepSnow || Snowfall.iceAge) {
+						if (Snowfall.deepSnow || Snowfall.veryDeepSnow) {
 							loc = loc.translate(-1, 0, -1);
 
 							for (int i = 0; i < 3; i++)
